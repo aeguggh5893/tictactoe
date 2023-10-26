@@ -7,6 +7,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 16px;
 }
 
 .main {
@@ -26,6 +27,21 @@ body {
 }
 
 .box {
-    background: yellow;
     border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+}
+
+.black {
+    background: black;
+}
+
+.white {
+    background: white;
+}
+
+h1 {
+    font-size: 1.5em;
 }
