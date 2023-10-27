@@ -76,12 +76,18 @@ function gameController() {
     ];
 
     let activePlayer = players[0].name;
+    let activePlayerMark = players[0].mark;
+    let activeDisplayName = players[1].name;
 
     const switchPlayer = () => {
-        activePlayer = activePlayer === players[0].name ? players[1].name : players[0].name; 
+        activePlayer = activePlayer === players[0].name ? players[1].name : players[0].name;
+        activePlayerMark = activePlayerMark === players[0].mark ? players[1].mark : players[0].mark;
+        activeDisplayName = activeDisplayName === players[1].name ? players[0].name : players[1].name;
     }
 
     const getActivePlayer = () => activePlayer;
+    const getActivePlayerMark = () => activePlayerMark;
+    const getActiveDisplayName = () => activeDisplayName;
 
     const printNewRound = () => {
         board.printBoard();
@@ -118,6 +124,8 @@ function gameController() {
     const resetGame = () => {
         board.resetBoard();
         activePlayer = players[0].name;
+        activePlayerMark = players[0].mark;
+        activeDisplayName = players[1].name;
         printNewRound();
     }
 
@@ -143,7 +151,69 @@ function gameController() {
 
     printNewRound();
 
-    return {getActivePlayer, placeMarker, resetGame}
+    return {getActivePlayer, placeMarker, resetGame, getActivePlayerMark, getActiveDisplayName, checkWinner}
 }
 
 const game = gameController();
+
+const userInterface = (function() {
+    const playBoard = document.querySelector('.gameBoard');
+    let playerTurnMessage = document.querySelector('.playerTurn');
+    const resetButton = document.querySelector('button');
+
+    for (let i = 0; i < 9; i++) {
+        const div = document.createElement('div');
+        div.classList.add('box');
+
+        if (i < 3) {
+            div.setAttribute('data-row', 0);
+        } else if (i < 6) {
+            div.setAttribute('data-row', 1);
+        } else {
+            div.setAttribute('data-row', 2);
+        }
+
+        playBoard.appendChild(div);
+    }
+
+    const allBox = document.querySelectorAll('.box');
+
+    allBox.forEach((item, index) => {
+        if (index === 0 || index === 3 || index === 6) {
+            item.setAttribute('data-column', 0);
+        } else if (index === 1 || index === 4 || index === 7) {
+            item.setAttribute('data-column', 1);
+        } else {
+            item.setAttribute('data-column', 2);
+        };
+    });
+
+    allBox.forEach(item => {
+        item.addEventListener('click', function() {
+
+            if (item.innerText) return;
+
+            item.innerText = game.getActivePlayerMark();
+            playerTurnMessage.innerText = `${game.getActiveDisplayName()}'s Turn`;
+            const a = +item.getAttribute('data-row');
+            const b = +item.getAttribute('data-column');
+            game.placeMarker(a,b);
+
+        const winner = game.checkWinner(gameBoard.getBoard());
+            if (winner === 'X' || winner === 'O') {
+                playerTurnMessage.innerText = `${game.getActiveDisplayName()} Wins! (${winner})`;  
+            } else if (winner === 'Tie') {
+                playerTurnMessage.innerText = 'Tie Game!'; 
+            }
+        });
+    });
+
+    resetButton.addEventListener('click', function() {
+        game.resetGame();
+        playerTurnMessage.innerText = "Player One's Turn";
+        allBox.forEach(item => {
+            item.innerText = '';
+        });
+    });
+
+})();
